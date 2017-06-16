@@ -3,13 +3,28 @@ package Proj1;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import com.firebase.*;
+import com.firebase.client.Firebase;
+
+class DataFirebase {
+	private Firebase jFirebase;
+	
+	public DataFirebase() {
+		jFirebase = new Firebase("https://quiz-61ac7.firebaseio.com");
+		Firebase qs = jFirebase.child("questions");
+		ModelPytanie q1 = new ModelPytanie();
+		qs.setValue(q1);
+		
+	}
+	
+	
+}
 
 public class Serwer {
 	private static ServerSocket server;
 	private static final int PORT = 2345;
 
 	public static void main(String[] args) {
+		DataFirebase db = new DataFirebase();
 		try {
 			server = new ServerSocket(PORT);
 			System.out.println("Serwer quizu został uruchomiony na porcie: " + PORT);
