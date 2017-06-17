@@ -1,25 +1,13 @@
-package Proj1;
+
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 import com.firebase.client.Firebase;
 
-class DataFirebase {
-	private Firebase jFirebase;
-	
-	public DataFirebase() {
-		jFirebase = new Firebase("https://quiz-61ac7.firebaseio.com");
-		Firebase qs = jFirebase.child("questions");
-		ModelPytanie q1 = new ModelPytanie();
-		qs.setValue(q1);
-		
-	}
-	
-	
-}
-
 public class Serwer {
+	
+	private static Firebase jFirebase = new Firebase("https://quiz-61ac7.firebaseio.com");
 	
 /*	super("Quiz");									//GUI do serwera
 	
@@ -56,7 +44,6 @@ public class Serwer {
 	private static final int PORT = 2345;
 
 	public static void main(String[] args) {
-		DataFirebase db = new DataFirebase();
 		try {
 			server = new ServerSocket(PORT);
 			System.out.println("Serwer quizu został uruchomiony na porcie: " + PORT);
@@ -116,6 +103,7 @@ class QuizObsluga extends Thread {
 		wyjscie.println();
 	}
 	
+	//wyswietla użytkownikowi pytanie
 	public void pokazPytanie (String pytanie, String odpowiedz) {
 		liczbaPytan++;
 		wyjscie.println(pytanie);
@@ -162,8 +150,10 @@ class QuizObsluga extends Thread {
 			//odczytanie i przesłanie tesktu
 			while (!(linia = wejscie.readLine()).equalsIgnoreCase("/end")) {
 				wyslijDoWszystkich("Użytkownik " + nick + "odpowiedział: " + linia);
-				ModelPytanie pytanie = new ModelPytanie();
-				pokazPytanie(pytanie.pytanie, pytanie.odpowiedz);
+				
+				//ModelPytanie pytanie = new ModelPytanie();
+				//pokazPytanie(pytanie.pytanie, pytanie.odpowiedz);
+				pokazPytanie("Pytanie: Na ile łap spada kot?", "4");
 			}
 			
 			wyslijDoWszystkich("Opuścił grę");

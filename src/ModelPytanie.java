@@ -1,12 +1,14 @@
-package Proj1;
+
 
 public class ModelPytanie {
 	public String pytanie;
 	public String odpowiedz;
 	
-	public ModelPytanie(){
-		pytanie = "Pytanie: Ile kropek ma biedronka?";
-		odpowiedz = "7";
+	public ModelPytanie(String pytanie, String odpowiedz){
+		this.pytanie = pytanie;
+		this.odpowiedz = odpowiedz;
+		/*pytanie = "Pytanie: Ile kropek ma biedronka?";
+		odpowiedz = "7";*/
 	}
 	
 	public String getPytanie() {

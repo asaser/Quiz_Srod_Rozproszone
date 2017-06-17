@@ -1,4 +1,4 @@
-package Proj1;
+
 
 
 //import dbObjects.model.PlayerScore;
@@ -7,14 +7,14 @@ import com.firebase.client.Firebase;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-
+/*
 	public DataFirebase() {
 		jFirebase = new Firebase("https://quiz-61ac7.firebaseio.com");
 		Firebase qs = jFirebase.child("questions");
 		ModelPytanie q1 = new ModelPytanie();
 		qs.setValue(q1);		
 	}	
-}
+}*/
 
 public class Client implements Runnable
 {
@@ -23,13 +23,13 @@ public class Client implements Runnable
 	static private final String SERVER = "localhost";
 	
  	private String answer;
-	private Socket socket;
+	//private Socket socket;
 	private BufferedReader wejscie;
 	private PrintWriter wyjscie;
 	private String nick;
 	private int liczbaPytan;
 	private int poprawneOdpowiedzi;
- 	private Question question;
+ 	private String prawOdpowiedz;
 	private DataOutputStream output;
     private ObjectInputStream input;
 
@@ -58,11 +58,11 @@ public class Client implements Runnable
                     // send smth to server, for server keep going send question
                     // if sent string 'stop', server will stop send question
                     sendRequestToServer(answer);
-                    question = (Question) getResponseFromServer();
-                    ask(question);
+                    prawOdpowiedz = (Question) getResponseFromServer();
+                    ask(prawOdpowiedz);
                     answer=wejscie.readLine().toUpperCase();
                     answer=checkAnswerForCommand(answer);
-                    checkAnswer(answer, question);
+                    checkAnswer(answer, prawOdpowiedz);
                 }
                 saveScore();
                 printTopTen((ArrayList<PlayerScore>) getResponseFromServer());
