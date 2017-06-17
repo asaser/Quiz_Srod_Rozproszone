@@ -20,6 +20,38 @@ class DataFirebase {
 }
 
 public class Serwer {
+	
+/*	super("Quiz");									//GUI do serwera
+	
+	setSize(350, 300);
+	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	setLayout(new BorderLayout());
+	
+	panel = new JPanel(new FlowLayout());
+	
+	komunikaty = new JTextArea();
+	komunikaty.setLineWrap(true);
+	komunikaty.setEditable(false);
+	
+	port = new JTextField((new Integer(numerPortu)).toString(), 8);
+	uruchom = new JButton("Uruchom");
+	zatrzymaj = new JButton("Zatrzymaj");
+	zatrzymaj.setEnabled(false);
+	
+	ObslugaZdarzen obsluga = new ObslugaZdarzen();
+	uruchom.addActionListener(obsluga);
+	zatrzymaj.addActionListener(obsluga);
+	
+	panel.add(new JLabel("Port: "));
+	panel.add(port);
+	panel.add(uruchom);
+	panel.add(zatrzymaj);
+	
+	add(panel, BorderLayout.NORTH);
+	add(new JScrollPane(komunikaty), BorderLayout.CENTER);
+	
+	setVisible(true);
+*/	
 	private static ServerSocket server;
 	private static final int PORT = 2345;
 
