@@ -148,12 +148,27 @@ public class Serwer extends JFrame implements Protocol{
                 ObjectOutputStream outputStream = new ObjectOutputStream(client.getOutputStream());
         		//outputStream.flush();
                 DataInputStream input = new DataInputStream(client.getInputStream());
+/******************************************/
+                File file1 = new File("pytania.txt");
+        		File file2 = new File("odpowiedzi.txt");
+        		Scanner in1 = new Scanner(file1);
+        		Scanner in2 = new Scanner(file2);
+        		String zapytanie, odpowiedz;
+/*****************************************/
                 
                 while (input.readBoolean()){
                 	System.out.println("Reached first while");
                     while (!input.readUTF().equalsIgnoreCase("stop")){
                     	System.out.println("second while working");
-                    	ModelPytanie pytanie = new ModelPytanie("Pytanie: Na ile łap spada kot?", "4");
+/*****************************************/   	
+                    	zapytanie = in1.nextLine();
+            			odpowiedz = in2.nextLine();
+            			System.out.println(zapytanie + " -> " + odpowiedz);
+            			ModelPytanie pytanie = new ModelPytanie(zapytanie, odpowiedz);
+            			//ModelPytanie pytanie = new ModelPytanie("Pytanie: Na ile łap spada kot?", "4");
+/*****************************************/
+
+                    	
                     	System.out.println(pytanie.pytanie);
                     	outputStream.writeObject(pytanie);
                         //question = getRandomQuestion(listWithQuestions);

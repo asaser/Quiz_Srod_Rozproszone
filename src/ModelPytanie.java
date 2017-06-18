@@ -1,6 +1,6 @@
+import java.io.Serializable;
 
-
-public class ModelPytanie {
+public class ModelPytanie implements Serializable {
 	public String pytanie;
 	public String odpowiedz;
 	

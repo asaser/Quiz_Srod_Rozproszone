@@ -1,0 +1,6 @@
+double x;
+3
+Using break;
+no above answers correct
+It is a class.
+It is a class used to read data from a binary file?

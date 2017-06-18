@@ -1,0 +1,6 @@
+How to declare an integer variable x?_int x;_long x;_integer x;_double x;_
+What is the value of x? int x=3>>2_0_1_2_3_
+How to do exit a loop?_Using break;_Using exit;_Using continue;_Using stop;_
+How to use println?_Output line of text_Declare avariable_exit program_no above answers correct_
+What is Scanner?_It is a class._It is a method._It is an interface._It is an abstract class_
+What is FileReader?_It is a class used to write data to a binary file?_It is a class used to read data from a binary file?_It is a class used to read data from a character file?_It is a class used to write data to a character file?_

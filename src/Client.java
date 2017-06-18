@@ -30,8 +30,8 @@ public class Client implements Runnable
 	private int liczbaPytan;
 	private int poprawneOdpowiedzi;
  	private ModelPytanie prawOdpowiedz;
-	private DataOutputStream output;
-    private ObjectInputStream input;
+	public DataOutputStream output;
+    public ObjectInputStream input;
     private Socket s;
 
     public Client() {}
@@ -74,7 +74,9 @@ public class Client implements Runnable
                 //printTopTen((ArrayList<PlayerScore>) getResponseFromServer());
                 inGame = false;
             }
-        }catch (Exception e){}
+        }catch (Exception e){
+        	System.out.println(e.getMessage());
+        }
     }
 
 
@@ -118,26 +120,6 @@ public class Client implements Runnable
         System.out.println(question.getPytanie());
     }
     
-    /*private String checkAnswerForCommand(String answer) throws IOException
-    {
-        while (answer.equalsIgnoreCase("HINT") || answer.equalsIgnoreCase("STAT"))
-        {
-            if (answer.equalsIgnoreCase("HINT"))
-            {
-                System.out.println("### Hints");
-                System.out.println(question.getHint());
-                answer = wejscie.readLine();
-            }
-            if (answer.equalsIgnoreCase("STAT"))
-            {
-                System.out.println("### Right answers/total questions : " + rightAnswers + "/" + totalQuestions);
-                System.out.println("### Your score is: " + (int) getScore() + "%");
-                System.out.println("### Your answer is for question# " + totalQuestions + " is:");
-                answer = wejscie.readLine();
-            }
-        }
-        return answer;
-    }*/
     
     private void saveScore() throws IOException
     {
