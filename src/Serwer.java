@@ -16,7 +16,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 public class Serwer extends JFrame implements Protocol{
 	
@@ -33,6 +36,8 @@ public class Serwer extends JFrame implements Protocol{
 	private boolean uruchomiony = false;
 	private Vector<QuizObsluga> klienci = new Vector<QuizObsluga>();
 	private static Firebase jFirebase = new Firebase("https://quiz-61ac7.firebaseio.com");
+	private static Firebase qRef = jFirebase.child("questions");
+	private static ModelPytanie mPytanie;
 	private static ServerSocket server;
 	private static final int PORT = 2345;
 	
@@ -91,13 +96,13 @@ public class Serwer extends JFrame implements Protocol{
 		public void kill() {
 			try {
 				server.close();
-				for (QuizObsluga klient : klienci) {
+				/*for (QuizObsluga klient : klienci) {
 					try {
 						klient.wyjscie.println("Serwer przestał działać!");
 						klient.socket.close();
 					} catch (IOException e) {
 					}
-				}
+				}*/
 				wyswietlKomunikat("Wszystkie Połączenia zostały zakończone.\n");
 			} catch (IOException e) {
 			}
@@ -106,11 +111,16 @@ public class Serwer extends JFrame implements Protocol{
 		public void run() {
 			try {
 				server = new ServerSocket(new Integer(port.getText()));
-				wyswietlKomunikat("Serwer uruchomiony na porcie: " + port.getText() + "\n");
+				System.out.println("Serwer quizu został uruchomiony na porcie: " + port.getText());
+				wyswietlKomunikat("Serwer quizu uruchomiony na porcie: " + port.getText() + "\n");
 				while (uruchomiony) {
 					Socket socket = server.accept();
+					InetAddress addr = socket.getInetAddress();
+					System.out.println("Połączenie z adresu: " + addr.getHostName() + " [" + addr.getHostAddress() + "]");
 					wyswietlKomunikat("Nowe połączenie.\n");
-					new QuizObsluga(socket).start();
+					//new QuizObsluga(socket).start();
+					Runnable r = () -> play(socket);
+					new Thread(r).start();
 				}
 			} catch (SocketException e) {
 			} catch (Exception e) {
@@ -123,29 +133,53 @@ public class Serwer extends JFrame implements Protocol{
 					wyswietlKomunikat(e.toString());
 				}
 			}
-			wyswietlKomunikat("Serwer zatrzymany.\n");
+			wyswietlKomunikat("Serwer quizu zatrzymany.\n");
+		}
+		
+		private void play(Socket client)
+	    {
+			//InetAddress addr = client.getInetAddress();
+			//System.out.println("Połączenie z adresu: " + addr.getHostName() + " [" + addr.getHostAddress() + "]");
+			
+            try {
+            	System.out.println("Trying streaming");
+            	
+            	//init streams for THIS client
+                ObjectOutputStream outputStream = new ObjectOutputStream(client.getOutputStream());
+        		//outputStream.flush();
+                DataInputStream input = new DataInputStream(client.getInputStream());
+                
+                while (input.readBoolean()){
+                	System.out.println("Reached first while");
+                    while (!input.readUTF().equalsIgnoreCase("stop")){
+                    	System.out.println("second while working");
+                    	ModelPytanie pytanie = new ModelPytanie("Pytanie: Na ile łap spada kot?", "4");
+                    	System.out.println(pytanie.pytanie);
+                    	outputStream.writeObject(pytanie);
+                        //question = getRandomQuestion(listWithQuestions);
+                        //sendQuestion(outputStream, question);
+                    }
+                    //savePlayer(playerScoreDao,input);
+                   // sendTopTen(outputStream);
+                }
+	        }catch (IOException e){}
+	    }
+		
+		private void wyswietlKomunikat(String tekst) {
+			komunikaty.append(tekst);
+			komunikaty.setCaretPosition(komunikaty.getDocument().getLength());
 		}
 	}
 	
 	
 
 	public static void main(String[] args) {
+		
 		new Serwer();
-		/*try {
-			server = new ServerSocket(PORT);
-			System.out.println("Serwer quizu został uruchomiony na porcie: " + PORT);
-			
-			//oczekiwanie na kolejne połączenia
-			while (true) {
-				Socket socket = server.accept();
-				InetAddress addr = socket.getInetAddress();
-				System.out.println("Połączenie z adresu: " + addr.getHostName() + " [" + addr.getHostAddress() + "]");
-				new QuizObsluga(socket).start();
-			}
-		} catch (IOException e) {
-			System.out.println(e);
-		}*/
+		
 	}
+	
+	
 	private class QuizObsluga extends Thread implements Protocol {
 		
 		//utoworzenie pola statycznego przechowującego referencje do wszystkich połączeń
@@ -167,6 +201,30 @@ public class Serwer extends JFrame implements Protocol{
 			this.poprawneOdpowiedzi = 0;
 			//wyslij(NEW_CONNECTION, addr.getHostAddress());
 		}
+		
+		public void odczytFirebase(){
+			Firebase losowyRef = qRef.child("1");
+			System.out.println("Uruchomiono odczytFirebase");
+			losowyRef.addListenerForSingleValueEvent(new ValueEventListener() {
+
+	            
+	            public void onDataChange(DataSnapshot dataSnapshot) {
+	                // ...
+	                mPytanie = dataSnapshot.getValue(ModelPytanie.class);
+	                System.out.println("Pobrano pytanie: " + mPytanie.pytanie);
+	                pokazPytanie(mPytanie.pytanie, mPytanie.odpowiedz);
+	                
+	            }
+
+	            
+	            public void onCancelled(FirebaseError databaseError) {
+	                // ...
+	                //Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+	            }
+
+	        });
+		}
+		
 		public void wyslij(String protocol, String tekst) {
 			wyjscie.println(protocol + tekst);
 		}
@@ -215,6 +273,8 @@ public class Serwer extends JFrame implements Protocol{
 				System.out.println("finally");
 			}
 		}
+		
+		
 
 		public void run() {
 			String linia;
@@ -244,7 +304,8 @@ public class Serwer extends JFrame implements Protocol{
 					
 					//ModelPytanie pytanie = new ModelPytanie();
 					//pokazPytanie(pytanie.pytanie, pytanie.odpowiedz);
-					pokazPytanie("Pytanie: Na ile łap spada kot?", "4");
+					//pokazPytanie("Pytanie: Na ile łap spada kot?", "4");
+					odczytFirebase();
 				}
 				
 				wyslijDoWszystkich("Opuścił grę");
@@ -268,10 +329,5 @@ public class Serwer extends JFrame implements Protocol{
 				}
 			}
 		}
-	}
-	
-	private void wyswietlKomunikat(String tekst) {
-		komunikaty.append(tekst);
-		komunikaty.setCaretPosition(komunikaty.getDocument().getLength());
 	}
 }

@@ -12,7 +12,7 @@ public class RMIregistryClient {
 
     public static void main(String[] args) {
 
-        String host = (args.length < 1) ? null : args[0];	//tutaj chyba zamiast 1 powinnien byæ x bo to mo¿e ile chce graczy wejœæ do gry
+        String host = (args.length < 1) ? null : args[0];	//tutaj chyba zamiast 1 powinnien byÄ‡ x bo to moÅ¼e ile chce graczy wejÅ›Ä‡ do gry
         
         try {
             Registry registry = LocateRegistry.getRegistry(host);

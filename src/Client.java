@@ -29,16 +29,19 @@ public class Client implements Runnable
 	private String nick;
 	private int liczbaPytan;
 	private int poprawneOdpowiedzi;
- 	private String prawOdpowiedz;
+ 	private ModelPytanie prawOdpowiedz;
 	private DataOutputStream output;
     private ObjectInputStream input;
+    private Socket s;
 
     public Client() {}
 
     public Client(String host, int port)throws IOException {
         s = new Socket(host, port);
-        input = new ObjectInputStream(s.getInputStream());
         output = new DataOutputStream(s.getOutputStream());
+        output.flush();
+        input = new ObjectInputStream(s.getInputStream());
+        
         wejscie=new BufferedReader(new InputStreamReader(System.in));
     }
 
@@ -52,20 +55,23 @@ public class Client implements Runnable
             while(inGame)
             {
                 sendRequestToServer(inGame);
+                System.out.println("First request send");
                 answer = "";
                 while (!answer.equalsIgnoreCase("stop"))
                 {
                     // send smth to server, for server keep going send question
                     // if sent string 'stop', server will stop send question
                     sendRequestToServer(answer);
-                    prawOdpowiedz = (Question) getResponseFromServer();
+                    System.out.println("second request send");
+                    //odczytanie odpowiedzi użytkownika
+                    prawOdpowiedz = (ModelPytanie) getResponseFromServer();
                     ask(prawOdpowiedz);
                     answer=wejscie.readLine().toUpperCase();
-                    answer=checkAnswerForCommand(answer);
+                    //answer=checkAnswerForCommand(answer);
                     checkAnswer(answer, prawOdpowiedz);
                 }
                 saveScore();
-                printTopTen((ArrayList<PlayerScore>) getResponseFromServer());
+                //printTopTen((ArrayList<PlayerScore>) getResponseFromServer());
                 inGame = false;
             }
         }catch (Exception e){}
@@ -106,13 +112,54 @@ public class Client implements Runnable
         Object object = input.readObject();
         return object;
     }
-    private void ask(Question question)
+    private void ask(ModelPytanie question)
     {
         System.out.println("### Question #" + (++liczbaPytan));
-        System.out.println(question.getQuestionText());
+        System.out.println(question.getPytanie());
+    }
+    
+    /*private String checkAnswerForCommand(String answer) throws IOException
+    {
+        while (answer.equalsIgnoreCase("HINT") || answer.equalsIgnoreCase("STAT"))
+        {
+            if (answer.equalsIgnoreCase("HINT"))
+            {
+                System.out.println("### Hints");
+                System.out.println(question.getHint());
+                answer = wejscie.readLine();
+            }
+            if (answer.equalsIgnoreCase("STAT"))
+            {
+                System.out.println("### Right answers/total questions : " + rightAnswers + "/" + totalQuestions);
+                System.out.println("### Your score is: " + (int) getScore() + "%");
+                System.out.println("### Your answer is for question# " + totalQuestions + " is:");
+                answer = wejscie.readLine();
+            }
+        }
+        return answer;
+    }*/
+    
+    private void saveScore() throws IOException
+    {
+        System.out.println("### Your score: " + (int)getScore());
+        System.out.println("### Would you like save your score: y/n");
+        //String temp = readConsole();
+        String temp = wejscie.readLine().toUpperCase();
+        if (temp.equalsIgnoreCase("Y"))
+        {
+            sendRequestToServer(getNick()+"/"+(int)getScore());
+        }
+        else
+        {
+            sendRequestToServer("");
+        }
+    }
+    
+    private String getNick() {
+    	return nick;
     }
 
-    public boolean checkAnswer(String answer, Question question) throws IOException
+    public boolean checkAnswer(String answer, ModelPytanie question) throws IOException
     {
         boolean isAnswerRight=false;
 
@@ -122,7 +169,7 @@ public class Client implements Runnable
             return isAnswerRight;
         }
 
-        if (answer.trim().equalsIgnoreCase(question.getAnswer().trim())) {
+        if (answer.trim().equalsIgnoreCase(question.getOdpowiedz().trim())) {
             System.out.println("### RIGHT!!!");
             poprawneOdpowiedzi++;
             isAnswerRight=true;
@@ -140,14 +187,13 @@ public class Client implements Runnable
         return score;
     }
 
-    public String getNick(){return nick;}
 
 
     public static void main(String[] args)
     {
         Client client = null;
         try {
-            client = new Client(host,port);
+            client = new Client(SERVER,PORT);
         } catch (IOException e) {e.printStackTrace();}
 
         new Thread(client).start();
